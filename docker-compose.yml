@@ -68,6 +68,10 @@ services:
         # Baked into the client bundle at build time; browser requests hit
         # the host-published API port
         NEXT_PUBLIC_API_URL: http://localhost:8000/api
+    environment:
+      # Force Next standalone to listen on all interfaces, not the container
+      # hostname, so the published port is reachable
+      HOSTNAME: "0.0.0.0"
     ports:
       - "3000:3000"
     depends_on:

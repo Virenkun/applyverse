@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { Sidebar } from "@/components/sidebar";
@@ -15,8 +15,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const display = Bricolage_Grotesque({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+});
+
 export const metadata: Metadata = {
-  title: "JobScrap",
+  title: "JobScrap — job tracker",
   description: "Personal job scraper and application tracker",
 };
 
@@ -28,13 +34,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${display.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <Providers>
-          <div className="flex min-h-screen">
+          <div className="flex min-h-screen w-full">
             <Sidebar />
-            <main className="min-w-0 flex-1 bg-muted/30">{children}</main>
+            <main className="flex min-w-0 flex-1 flex-col bg-background">
+              {children}
+            </main>
           </div>
         </Providers>
       </body>
