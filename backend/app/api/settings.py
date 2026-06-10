@@ -22,6 +22,7 @@ ALL_SOURCES = [
     "weworkremotely",
     "naukri",
     "wellfound",
+    "linkedin",
 ]
 
 
@@ -30,6 +31,8 @@ def _is_available(source: str) -> bool:
         return app_settings.enable_naukri
     if source == "wellfound":
         return app_settings.enable_wellfound
+    if source == "linkedin":
+        return app_settings.enable_linkedin
     return True
 
 

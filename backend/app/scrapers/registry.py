@@ -28,26 +28,30 @@ HARD_SOURCES: list[str] = []
 
 
 def register_hard_sources() -> None:
+    from app.scrapers.linkedin import LinkedInScraper
     from app.scrapers.naukri import NaukriScraper
     from app.scrapers.wellfound import WellfoundScraper
 
     SCRAPERS["naukri"] = NaukriScraper
     SCRAPERS["wellfound"] = WellfoundScraper
-    HARD_SOURCES[:] = ["naukri", "wellfound"]
+    SCRAPERS["linkedin"] = LinkedInScraper
+    HARD_SOURCES[:] = ["naukri", "wellfound", "linkedin"]
 
 
 def enabled_sources() -> list[str]:
     sources = list(EASY_SOURCES)
-    if settings.enable_naukri or settings.enable_wellfound:
+    if settings.enable_naukri or settings.enable_wellfound or settings.enable_linkedin:
         register_hard_sources()
         if settings.enable_naukri:
             sources.append("naukri")
         if settings.enable_wellfound:
             sources.append("wellfound")
+        if settings.enable_linkedin:
+            sources.append("linkedin")
     return sources
 
 
 def build_scraper(name: str) -> BaseScraper:
-    if name in ("naukri", "wellfound") and name not in SCRAPERS:
+    if name in ("naukri", "wellfound", "linkedin") and name not in SCRAPERS:
         register_hard_sources()
     return SCRAPERS[name]()

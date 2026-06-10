@@ -16,6 +16,10 @@ class Settings(BaseSettings):
 
     enable_naukri: bool = False
     enable_wellfound: bool = False
+    enable_linkedin: bool = False
+
+    # Optional: enables LLM-assisted company discovery
+    anthropic_api_key: str | None = None
 
     # Drives both what keyword sources search for and which scraped jobs are
     # kept — a job is stored only if its title/tags contain one of these.

@@ -20,7 +20,11 @@ def trigger_scrape(
     from app.worker import run_all, run_source
 
     if source is not None:
-        if source not in registry.SCRAPERS and source not in ("naukri", "wellfound"):
+        if source not in registry.SCRAPERS and source not in (
+            "naukri",
+            "wellfound",
+            "linkedin",
+        ):
             raise HTTPException(404, f"unknown source: {source}")
         background.add_task(run_source, source)
         return {"started": [source]}

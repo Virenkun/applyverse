@@ -50,6 +50,7 @@ class Source(str, enum.Enum):
     weworkremotely = "weworkremotely"
     wellfound = "wellfound"
     naukri = "naukri"
+    linkedin = "linkedin"
 
 
 class Company(Base):

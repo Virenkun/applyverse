@@ -18,6 +18,8 @@ dependencies = [
     "apscheduler>=3.10,<4",
     "python-dateutil>=2.9",
     "playwright>=1.48",
+    "ddgs>=9.0",
+    "anthropic>=0.40",
 ]
 
 [tool.setuptools.packages.find]

@@ -48,12 +48,19 @@ npm run dev                              # dashboard on :3000
    keywords; the rest are counted as "off-keyword" in Settings → Recent scrape runs.
    After changing keywords, clean older noise with
    `python -m app.prune --execute` (jobs you saved/applied to are never deleted).
-2. **Company auto-discovery** — keyword sources (RemoteOK, WeWorkRemotely, Naukri)
-   create companies as they appear. A daily discovery job (`python -m app.worker
-   --discover` to run manually) probes each new company for a public Greenhouse /
-   Lever / Ashby / SmartRecruiters / Recruitee / Workable board and, on a hit, its
-   whole board joins the polling rotation automatically.
-3. **Seed companies** — `companies.yaml` is just a starter/extras list for boards you
+2. **Web-search discovery** — ATS job pages are public and search-indexed, so the
+   daily discovery job runs `site:boards.greenhouse.io "<keyword>"` style queries
+   (DuckDuckGo, no API key) for every keyword × ATS platform, extracts the company
+   slugs from result URLs, validates each against the ATS API, and registers the
+   board. This is how keywords reach across *all* of Greenhouse/Lever/Ashby/etc.
+   despite those APIs being per-company.
+3. **LLM discovery (optional)** — set `ANTHROPIC_API_KEY` and the discovery job also
+   asks Claude (with web search) for companies currently hiring your keywords,
+   registering any ATS boards it returns. Uses Haiku — costs pennies per day.
+4. **Scraper-sourced discovery** — companies surfaced by keyword sources (LinkedIn,
+   Naukri, RemoteOK, WeWorkRemotely) are probed for ATS boards too.
+   Run everything manually with `python -m app.worker --discover`.
+5. **Seed companies** — `companies.yaml` is just a starter/extras list for boards you
    care about explicitly; the pipeline no longer depends on it.
 
 ## Adding companies manually
@@ -77,6 +84,7 @@ Re-run `python -m app.seed` after manual edits.
 | WeWorkRemotely | RSS | on |
 | Naukri | Headless Chrome + jobapi interception | off (`ENABLE_NAUKRI=true`) |
 | Wellfound | Headless Chrome + __NEXT_DATA__ parse | off (`ENABLE_WELLFOUND=true`) |
+| LinkedIn | Guest search endpoint (no login) | off (`ENABLE_LINKEDIN=true`) |
 
 Jobs unseen for 2 consecutive successful runs of their source are marked inactive.
 
@@ -90,3 +98,8 @@ Jobs unseen for 2 consecutive successful runs of their source are marked inactiv
   datacenter IPs. The scraper is best-effort: when the challenge page is served the run
   is recorded as an error in Settings → Recent scrape runs and other sources are
   unaffected.
+- **LinkedIn** uses the guest search endpoint (anonymous, no credentials). Scraping
+  LinkedIn violates their ToS and they rate-limit hard (HTTP 429/999) — volume is kept
+  low (2 pages per keyword), descriptions are not fetched, and a fully blocked run is
+  recorded as an error without affecting other sources. Your IP can still get
+  temporarily blocked; disable if that becomes a problem.

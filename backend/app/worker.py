@@ -132,8 +132,24 @@ def run_all() -> list[dict]:
 
 
 def run_discovery() -> dict:
+    """Keyword-driven company discovery: web search first, optional LLM
+    suggestions, then ATS probes for companies surfaced by scrapers."""
+    from app.services.llm_discover import discover_companies_via_llm
+    from app.services.web_discover import discover_companies_via_search
+
+    results: dict = {}
     with SessionLocal() as db:
-        return discover_ats_boards(db)
+        try:
+            results["web_search"] = discover_companies_via_search(db)
+        except Exception:
+            logger.exception("web search discovery failed")
+        try:
+            results["llm"] = discover_companies_via_llm(db)
+        except Exception:
+            logger.exception("llm discovery failed")
+        results["probe"] = discover_ats_boards(db)
+    logger.info("discovery summary: %s", results)
+    return results
 
 
 def main() -> None:
