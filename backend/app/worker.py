@@ -16,7 +16,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 
 from app.config import settings
 from app.db import SessionLocal
-from app.models import Company, ScrapeRun
+from app.models import Company, ScrapeRun, SourceSetting
 from app.scrapers import registry
 from app.services.dedupe import get_or_create_company, upsert_job
 from app.services.freshness import mark_stale_jobs_inactive
@@ -30,6 +30,12 @@ COMMIT_EVERY = 50
 
 
 def run_source(source_name: str) -> dict:
+    with SessionLocal() as check_db:
+        toggle = check_db.get(SourceSetting, source_name)
+        if toggle is not None and not toggle.enabled:
+            logger.info("scrape skipped (disabled): %s", source_name)
+            return {"source": source_name, "status": "skipped"}
+
     logger.info("scrape start: %s", source_name)
     scraper = registry.build_scraper(source_name)
 
