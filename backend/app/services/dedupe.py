@@ -41,6 +41,9 @@ def upsert_job(db: Session, raw: RawJob, company: Company | None = None) -> str:
     Returns "new" (job created), "updated" (same source seen again) or
     "linked" (job already known from another source).
     """
+    # Session runs with autoflush off — flush so the duplicate checks below
+    # also see rows added earlier in this batch (same job on two boards)
+    db.flush()
     now = datetime.now(timezone.utc)
 
     existing_source = db.scalar(
