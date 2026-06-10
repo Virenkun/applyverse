@@ -82,6 +82,7 @@ class Job(Base):
     salary_max: Mapped[int | None] = mapped_column(BigInteger)
     currency: Mapped[str | None] = mapped_column(String(10))
     description: Mapped[str | None] = mapped_column(Text)
+    description_html: Mapped[str | None] = mapped_column(Text)
     tags: Mapped[list[str] | None] = mapped_column(ARRAY(String))
     canonical_url: Mapped[str | None] = mapped_column(String(1000))
     posted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
@@ -164,6 +165,16 @@ class Application(Base):
     )
 
     job: Mapped[Job] = relationship(back_populates="application")
+
+
+class SourceSetting(Base):
+    __tablename__ = "source_settings"
+
+    source: Mapped[str] = mapped_column(String(50), primary_key=True)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
 
 
 class ScrapeRun(Base):

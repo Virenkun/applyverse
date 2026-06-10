@@ -60,6 +60,7 @@ def upgrade() -> None:
         sa.Column("salary_max", sa.BigInteger()),
         sa.Column("currency", sa.String(10)),
         sa.Column("description", sa.Text()),
+        sa.Column("description_html", sa.Text()),
         sa.Column("tags", ARRAY(sa.String())),
         sa.Column("canonical_url", sa.String(1000)),
         sa.Column("posted_at", sa.DateTime(timezone=True)),

@@ -17,7 +17,6 @@ companies:
   - { name: Brex, ats: greenhouse, board_id: brex }
   - { name: Airtable, ats: greenhouse, board_id: airtable }
   - { name: Asana, ats: greenhouse, board_id: asana }
-  - { name: Grammarly, ats: greenhouse, board_id: grammarly }
   - { name: Reddit, ats: greenhouse, board_id: reddit }
   - { name: Robinhood, ats: greenhouse, board_id: robinhood }
   - { name: Anthropic, ats: greenhouse, board_id: anthropic }
@@ -26,7 +25,6 @@ companies:
   - { name: Palantir, ats: lever, board_id: palantir }
   - { name: Plusgrade, ats: lever, board_id: plusgrade }
   - { name: Voleon, ats: lever, board_id: voleon }
-  - { name: Attentive, ats: lever, board_id: attentive }
   - { name: Kraken, ats: lever, board_id: kraken123 }
 
   # Ashby
