@@ -1,0 +1,45 @@
+# Target companies polled by ATS scrapers.
+# ats: greenhouse | lever | ashby | smartrecruiters | recruitee | workable
+# board_id: company slug in that ATS's public API
+companies:
+  # Greenhouse
+  - { name: Stripe, ats: greenhouse, board_id: stripe }
+  - { name: GitLab, ats: greenhouse, board_id: gitlab }
+  - { name: Figma, ats: greenhouse, board_id: figma }
+  - { name: Databricks, ats: greenhouse, board_id: databricks }
+  - { name: Coinbase, ats: greenhouse, board_id: coinbase }
+  - { name: Dropbox, ats: greenhouse, board_id: dropbox }
+  - { name: Duolingo, ats: greenhouse, board_id: duolingo }
+  - { name: Twilio, ats: greenhouse, board_id: twilio }
+  - { name: Cloudflare, ats: greenhouse, board_id: cloudflare }
+  - { name: Vercel, ats: greenhouse, board_id: vercel }
+  - { name: Postman, ats: greenhouse, board_id: postman }
+  - { name: Brex, ats: greenhouse, board_id: brex }
+  - { name: Airtable, ats: greenhouse, board_id: airtable }
+  - { name: Asana, ats: greenhouse, board_id: asana }
+  - { name: Grammarly, ats: greenhouse, board_id: grammarly }
+  - { name: Reddit, ats: greenhouse, board_id: reddit }
+  - { name: Robinhood, ats: greenhouse, board_id: robinhood }
+  - { name: Anthropic, ats: greenhouse, board_id: anthropic }
+
+  # Lever
+  - { name: Palantir, ats: lever, board_id: palantir }
+  - { name: Plusgrade, ats: lever, board_id: plusgrade }
+  - { name: Voleon, ats: lever, board_id: voleon }
+  - { name: Attentive, ats: lever, board_id: attentive }
+  - { name: Kraken, ats: lever, board_id: kraken123 }
+
+  # Ashby
+  - { name: Linear, ats: ashby, board_id: linear }
+  - { name: Ramp, ats: ashby, board_id: ramp }
+  - { name: Notion, ats: ashby, board_id: notion }
+  - { name: OpenAI, ats: ashby, board_id: openai }
+  - { name: Replit, ats: ashby, board_id: replit }
+  - { name: Deel, ats: ashby, board_id: deel }
+  - { name: Supabase, ats: ashby, board_id: supabase }
+  - { name: PostHog, ats: ashby, board_id: posthog }
+
+  # SmartRecruiters
+  - { name: Visa, ats: smartrecruiters, board_id: Visa }
+  - { name: Ubisoft, ats: smartrecruiters, board_id: Ubisoft2 }
+  - { name: Bosch, ats: smartrecruiters, board_id: BoschGroup }
