@@ -13,6 +13,7 @@ import logging
 from datetime import datetime, timezone
 
 from apscheduler.schedulers.blocking import BlockingScheduler
+from sqlalchemy import text
 
 from app.config import settings
 from app.db import SessionLocal
@@ -35,6 +36,23 @@ def run_source(source_name: str) -> dict:
         if toggle is not None and not toggle.enabled:
             logger.info("scrape skipped (disabled): %s", source_name)
             return {"source": source_name, "status": "skipped"}
+
+    # Advisory lock so a concurrent run of the same source (second trigger
+    # click, overlapping schedule, second worker) skips. Session-level locks
+    # live on the connection, so hold a dedicated one for the whole run —
+    # an ORM session would return its connection to the pool on commit and
+    # leak the lock.
+    from app.db import engine
+
+    lock_conn = engine.connect()
+    locked = lock_conn.execute(
+        text("select pg_try_advisory_lock(hashtext('scrape'), hashtext(:src))"),
+        {"src": source_name},
+    ).scalar()
+    if not locked:
+        lock_conn.close()
+        logger.info("scrape skipped (already running): %s", source_name)
+        return {"source": source_name, "status": "skipped"}
 
     logger.info("scrape start: %s", source_name)
     scraper = registry.build_scraper(source_name)
@@ -83,6 +101,11 @@ def run_source(source_name: str) -> dict:
         deactivated = 0
     db.close()
     run_db.close()
+    lock_conn.execute(
+        text("select pg_advisory_unlock(hashtext('scrape'), hashtext(:src))"),
+        {"src": source_name},
+    )
+    lock_conn.close()
 
     stats = {
         "source": source_name,

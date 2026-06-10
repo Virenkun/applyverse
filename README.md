@@ -13,10 +13,10 @@ Scrapes jobs from ATS career pages (Greenhouse, Lever, Ashby, SmartRecruiters, R
 ```bash
 cp .env.example .env
 docker compose up -d --build
-docker compose exec api alembic upgrade head
-docker compose exec api python -m app.seed          # load companies.yaml
-docker compose exec worker python -m app.worker --once   # first scrape
 ```
+
+The api container runs migrations and seeds `companies.yaml` on start; the worker
+scrapes every enabled source immediately, then on its schedule.
 
 Dashboard: http://localhost:3000 · API docs: http://localhost:8000/docs
 
@@ -60,7 +60,18 @@ Re-run `python -m app.seed` after manual edits.
 | Greenhouse / Lever / Ashby / SmartRecruiters / Recruitee / Workable | Public JSON APIs | on |
 | RemoteOK | Public JSON API | on |
 | WeWorkRemotely | RSS | on |
-| Naukri | Internal JSON API / Playwright | off (`ENABLE_NAUKRI=true`) |
-| Wellfound | GraphQL / Playwright | off (`ENABLE_WELLFOUND=true`) |
+| Naukri | Headless Chrome + jobapi interception | off (`ENABLE_NAUKRI=true`) |
+| Wellfound | Headless Chrome + __NEXT_DATA__ parse | off (`ENABLE_WELLFOUND=true`) |
 
 Jobs unseen for 2 consecutive successful runs of their source are marked inactive.
+
+### Naukri / Wellfound caveats
+
+- **Naukri** trips Akamai with the bundled chromium headless-shell but works with a real
+  Chrome install (the scraper tries the `chrome` channel first). Run the worker on the
+  host for Naukri — inside Docker on Apple Silicon there is no Chrome build, so it will
+  likely report "Access Denied". It searches `SEARCH_KEYWORDS` in `SEARCH_LOCATION`.
+- **Wellfound** sits behind DataDome, which currently blocks headless browsers and
+  datacenter IPs. The scraper is best-effort: when the challenge page is served the run
+  is recorded as an error in Settings → Recent scrape runs and other sources are
+  unaffected.
