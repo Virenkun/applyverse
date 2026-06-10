@@ -100,6 +100,7 @@ export interface ScrapeRun {
   jobs_found: number;
   jobs_new: number;
   jobs_updated: number;
+  jobs_skipped: number;
   status: string;
   error: string | null;
 }

@@ -63,6 +63,7 @@ class Company(Base):
     ats_board_id: Mapped[str | None] = mapped_column(String(200))
     glassdoor_rating: Mapped[float | None] = mapped_column(Float)
     notes: Mapped[str | None] = mapped_column(Text)
+    ats_probed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -189,5 +190,6 @@ class ScrapeRun(Base):
     jobs_found: Mapped[int] = mapped_column(BigInteger, default=0)
     jobs_new: Mapped[int] = mapped_column(BigInteger, default=0)
     jobs_updated: Mapped[int] = mapped_column(BigInteger, default=0)
+    jobs_skipped: Mapped[int] = mapped_column(BigInteger, default=0)
     status: Mapped[str] = mapped_column(String(20), default="running")
     error: Mapped[str | None] = mapped_column(Text)

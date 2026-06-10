@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import argparse
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 from sqlalchemy import text
@@ -20,6 +20,8 @@ from app.db import SessionLocal
 from app.models import Company, ScrapeRun, SourceSetting
 from app.scrapers import registry
 from app.services.dedupe import get_or_create_company, upsert_job
+from app.services.discover import discover_ats_boards
+from app.services.filtering import keyword_list, matches_keywords
 from app.services.freshness import mark_stale_jobs_inactive
 
 logging.basicConfig(
@@ -62,11 +64,15 @@ def run_source(source_name: str) -> dict:
     run_db.add(run)
     run_db.commit()
 
-    found = new = updated = 0
+    found = new = updated = skipped = 0
+    keywords = keyword_list()
     db = SessionLocal()
     company_cache: dict[str, Company] = {}
     try:
         for raw in scraper.fetch(db):
+            if not matches_keywords(raw, keywords):
+                skipped += 1
+                continue
             company = company_cache.get(raw.company_name)
             if company is None:
                 company = get_or_create_company(db, raw.company_name)
@@ -92,6 +98,7 @@ def run_source(source_name: str) -> dict:
         run.jobs_found = found
         run.jobs_new = new
         run.jobs_updated = updated
+        run.jobs_skipped = skipped
         run_db.commit()
 
     if run.status == "ok":
@@ -113,6 +120,7 @@ def run_source(source_name: str) -> dict:
         "found": found,
         "new": new,
         "updated": updated,
+        "skipped": skipped,
         "deactivated": deactivated,
     }
     logger.info("scrape done: %s", stats)
@@ -123,12 +131,23 @@ def run_all() -> list[dict]:
     return [run_source(name) for name in registry.enabled_sources()]
 
 
+def run_discovery() -> dict:
+    with SessionLocal() as db:
+        return discover_ats_boards(db)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--once", action="store_true", help="run once and exit")
     parser.add_argument("--source", help="limit to one source")
+    parser.add_argument(
+        "--discover", action="store_true", help="probe companies for ATS boards"
+    )
     args = parser.parse_args()
 
+    if args.discover:
+        run_discovery()
+        return
     if args.once:
         if args.source:
             run_source(args.source)
@@ -152,8 +171,20 @@ def main() -> None:
             max_instances=1,
             coalesce=True,
         )
+    scheduler.add_job(
+        run_discovery,
+        "interval",
+        hours=24,
+        jitter=600,
+        id="ats_discovery",
+        next_run_time=datetime.now(timezone.utc) + timedelta(minutes=15),
+        max_instances=1,
+        coalesce=True,
+    )
     logger.info(
-        "scheduler started: easy every %sh, hard every %sh", easy_hours, hard_hours
+        "scheduler started: easy every %sh, hard every %sh, discovery daily",
+        easy_hours,
+        hard_hours,
     )
     scheduler.start()
 

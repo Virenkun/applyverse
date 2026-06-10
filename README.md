@@ -41,7 +41,22 @@ npm install
 npm run dev                              # dashboard on :3000
 ```
 
-## Adding companies
+## How jobs flow in
+
+1. **Keyword filter** — `SEARCH_KEYWORDS` in `.env` decides what gets stored. Every
+   scraped job from every source is kept only if its title or tags contain one of the
+   keywords; the rest are counted as "off-keyword" in Settings → Recent scrape runs.
+   After changing keywords, clean older noise with
+   `python -m app.prune --execute` (jobs you saved/applied to are never deleted).
+2. **Company auto-discovery** — keyword sources (RemoteOK, WeWorkRemotely, Naukri)
+   create companies as they appear. A daily discovery job (`python -m app.worker
+   --discover` to run manually) probes each new company for a public Greenhouse /
+   Lever / Ashby / SmartRecruiters / Recruitee / Workable board and, on a hit, its
+   whole board joins the polling rotation automatically.
+3. **Seed companies** — `companies.yaml` is just a starter/extras list for boards you
+   care about explicitly; the pipeline no longer depends on it.
+
+## Adding companies manually
 
 Edit `backend/companies.yaml` (or use the Settings page). Each entry:
 

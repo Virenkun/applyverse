@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.models import Company, JobSource
 from app.scrapers.base import BaseScraper, RawJob, infer_work_mode, strip_html
+from app.services.filtering import keyword_list
 
 PAGE_SIZE = 100
 MAX_POSTINGS_PER_COMPANY = 200
@@ -41,6 +42,7 @@ class SmartRecruitersScraper(BaseScraper):
         companies = db.scalars(
             select(Company).where(Company.ats_type == self.name)
         ).all()
+        kws = keyword_list()
         for company in companies:
             detail_budget = MAX_DETAIL_FETCHES_PER_COMPANY
             for offset in range(0, MAX_POSTINGS_PER_COMPANY, PAGE_SIZE):
@@ -56,7 +58,10 @@ class SmartRecruitersScraper(BaseScraper):
                         p for p in (loc.get("city"), loc.get("country")) if p
                     )
                     posting_id = str(j["id"])
-                    # Descriptions cost one request each — only fetch for unseen jobs
+                    title_lower = (j.get("name") or "").lower()
+                    # Descriptions cost one request each — only fetch for
+                    # unseen jobs that can pass the keyword filter anyway
+                    relevant = not kws or any(kw in title_lower for kw in kws)
                     description = description_html = None
                     is_known = (
                         db.scalar(
@@ -67,7 +72,7 @@ class SmartRecruitersScraper(BaseScraper):
                         )
                         is not None
                     )
-                    if not is_known and detail_budget > 0:
+                    if not is_known and relevant and detail_budget > 0:
                         detail_budget -= 1
                         description, description_html = self._fetch_description(
                             company.ats_board_id, posting_id

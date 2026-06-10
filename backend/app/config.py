@@ -17,7 +17,12 @@ class Settings(BaseSettings):
     enable_naukri: bool = False
     enable_wellfound: bool = False
 
-    search_keywords: str = "software engineer"
+    # Drives both what keyword sources search for and which scraped jobs are
+    # kept — a job is stored only if its title/tags contain one of these.
+    search_keywords: str = (
+        "software engineer,software developer,developer,full stack,"
+        "backend,frontend,front end,back end,devops,sde,data engineer"
+    )
     search_location: str = "india"
 
     companies_file: Path = BACKEND_DIR / "companies.yaml"

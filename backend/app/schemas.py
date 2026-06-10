@@ -118,6 +118,7 @@ class ScrapeRunOut(ORMModel):
     jobs_found: int
     jobs_new: int
     jobs_updated: int
+    jobs_skipped: int = 0
     status: str
     error: str | None = None
 

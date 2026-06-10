@@ -139,7 +139,7 @@ export default function SettingsPage() {
                   title={r.error ?? undefined}
                 >
                   {r.status === "ok"
-                    ? `${r.jobs_found} found · ${r.jobs_new} new · ${r.jobs_updated} updated`
+                    ? `${r.jobs_found} kept · ${r.jobs_new} new · ${r.jobs_skipped} off-keyword`
                     : r.status === "error"
                       ? r.error
                       : "running…"}
