@@ -22,6 +22,10 @@ def dedupe_hash(title: str, company_name: str, location: str | None) -> str:
     return hashlib.sha256(key.encode()).hexdigest()
 
 
+def unique_tags(tags: list[str]) -> list[str] | None:
+    return list(dict.fromkeys(t for t in tags if t)) or None
+
+
 def get_or_create_company(db: Session, name: str) -> Company:
     company = db.scalar(select(Company).where(Company.name == name))
     if company is None:
@@ -91,7 +95,7 @@ def upsert_job(db: Session, raw: RawJob, company: Company | None = None) -> str:
         currency=raw.currency,
         description=raw.description,
         description_html=raw.description_html,
-        tags=raw.tags or None,
+        tags=unique_tags(raw.tags),
         canonical_url=raw.url,
         posted_at=raw.posted_at,
         last_seen_at=now,

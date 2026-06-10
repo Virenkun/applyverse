@@ -1,65 +1,195 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import {
+  AlarmClock,
+  ArrowRight,
+  Briefcase,
+  CalendarCheck,
+  MessageSquare,
+  Sparkles,
+} from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+import { JobCard } from "@/components/job-card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { api } from "@/lib/api";
+
+function StatCard({
+  label,
+  value,
+  hint,
+  icon: Icon,
+}: {
+  label: string;
+  value: string | number;
+  hint?: string;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <Card className="gap-2 py-4">
+      <CardHeader className="flex flex-row items-center justify-between px-4">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
+          {label}
+        </CardTitle>
+        <Icon className="size-4 text-muted-foreground" />
+      </CardHeader>
+      <CardContent className="px-4">
+        <div className="text-2xl font-semibold tracking-tight">{value}</div>
+        {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function OverviewPage() {
+  const stats = useQuery({ queryKey: ["stats", "overview"], queryFn: api.stats.overview });
+  const timeline = useQuery({
+    queryKey: ["stats", "timeline"],
+    queryFn: () => api.stats.timeline(30),
+  });
+  const recentJobs = useQuery({
+    queryKey: ["jobs", "recent"],
+    queryFn: () => api.jobs.list({ page_size: 5 }),
+  });
+
+  const s = stats.data;
+
+  return (
+    <div className="mx-auto max-w-5xl p-6">
+      <h1 className="text-xl font-semibold tracking-tight">Overview</h1>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {s ? (
+          <>
+            <StatCard
+              label="New jobs today"
+              value={s.jobs_new_today.toLocaleString()}
+              hint={`${s.jobs_active.toLocaleString()} active total`}
+              icon={Sparkles}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <StatCard
+              label="Applied this week"
+              value={s.applied_this_week}
+              hint={`${s.applications_total} tracked total`}
+              icon={CalendarCheck}
+            />
+            <StatCard
+              label="Interviewing"
+              value={s.interviewing}
+              hint={`${s.offers} offer${s.offers === 1 ? "" : "s"}`}
+              icon={MessageSquare}
+            />
+            <StatCard
+              label="Response rate"
+              value={s.response_rate !== null ? `${Math.round(s.response_rate * 100)}%` : "—"}
+              hint={
+                s.followups_due > 0
+                  ? `${s.followups_due} follow-up${s.followups_due === 1 ? "" : "s"} due`
+                  : "no follow-ups due"
+              }
+              icon={AlarmClock}
+            />
+          </>
+        ) : (
+          Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-28" />
+          ))
+        )}
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Jobs scraped — last 30 days</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {timeline.data ? (
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={timeline.data}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis
+                    dataKey="date"
+                    tickFormatter={(d: string) => d.slice(5)}
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis fontSize={11} tickLine={false} axisLine={false} width={40} />
+                  <Tooltip />
+                  <Bar dataKey="jobs_scraped" name="jobs" fill="var(--chart-2)" radius={[3, 3, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <Skeleton className="h-55" />
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Applications — last 30 days</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {timeline.data ? (
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={timeline.data}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis
+                    dataKey="date"
+                    tickFormatter={(d: string) => d.slice(5)}
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis fontSize={11} tickLine={false} axisLine={false} width={40} allowDecimals={false} />
+                  <Tooltip />
+                  <Bar dataKey="applications" fill="var(--chart-1)" radius={[3, 3, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <Skeleton className="h-55" />
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="mt-6">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-medium">Latest jobs</h2>
+          <Link
+            href="/jobs"
+            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
           >
-            Documentation
-          </a>
+            All jobs <ArrowRight className="size-3.5" />
+          </Link>
         </div>
-      </main>
+        <div className="space-y-3">
+          {recentJobs.data ? (
+            recentJobs.data.items.map((job) => <JobCard key={job.id} job={job} />)
+          ) : (
+            <Skeleton className="h-32" />
+          )}
+          {recentJobs.data?.items.length === 0 && (
+            <Card>
+              <CardContent className="py-10 text-center text-sm text-muted-foreground">
+                <Briefcase className="mx-auto mb-2 size-6" />
+                No jobs yet — trigger a scrape from Settings.
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

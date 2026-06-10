@@ -56,10 +56,12 @@ services:
       - ./backend/companies.yaml:/code/companies.yaml
 
   web:
-    build: ./frontend
-    environment:
-      # Browser-side requests go to the host-published API port
-      NEXT_PUBLIC_API_URL: http://localhost:8000/api
+    build:
+      context: ./frontend
+      args:
+        # Baked into the client bundle at build time; browser requests hit
+        # the host-published API port
+        NEXT_PUBLIC_API_URL: http://localhost:8000/api
     ports:
       - "3000:3000"
     depends_on:
