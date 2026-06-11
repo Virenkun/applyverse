@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { Loader2, Search, X } from "lucide-react";
+import { Loader2, MapPin, Search, X } from "lucide-react";
 
 import { JobCard } from "@/components/job-card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,8 @@ const ANY = "__any__";
 export default function JobsPage() {
   const [search, setSearch] = useState("");
   const [q, setQ] = useState("");
+  const [locationDraft, setLocationDraft] = useState("");
+  const [location, setLocation] = useState("");
   const [workMode, setWorkMode] = useState(ANY);
   const [source, setSource] = useState(ANY);
   const [companyId, setCompanyId] = useState(ANY);
@@ -32,6 +34,7 @@ export default function JobsPage() {
   const filters: JobFilters = useMemo(() => {
     const f: JobFilters = { page_size: PAGE_SIZE };
     if (q) f.q = q;
+    if (location) f.location = location;
     if (workMode !== ANY) f.work_mode = workMode;
     if (source !== ANY) f.source = source;
     if (companyId !== ANY) f.company_id = Number(companyId);
@@ -41,7 +44,7 @@ export default function JobsPage() {
       f.posted_after = d.toISOString();
     }
     return f;
-  }, [q, workMode, source, companyId, postedDays]);
+  }, [q, location, workMode, source, companyId, postedDays]);
 
   const filterOptions = useQuery({
     queryKey: ["jobs", "filter-options"],
@@ -59,11 +62,23 @@ export default function JobsPage() {
   const jobs = jobsQuery.data?.pages.flatMap((p) => p.items) ?? [];
   const total = jobsQuery.data?.pages[0]?.total;
   const hasActiveFilters =
-    q || workMode !== ANY || source !== ANY || companyId !== ANY || postedDays !== ANY;
+    q ||
+    location ||
+    workMode !== ANY ||
+    source !== ANY ||
+    companyId !== ANY ||
+    postedDays !== ANY;
+
+  const applySearch = () => {
+    setQ(search);
+    setLocation(locationDraft.trim());
+  };
 
   const clearFilters = () => {
     setSearch("");
     setQ("");
+    setLocationDraft("");
+    setLocation("");
     setWorkMode(ANY);
     setSource(ANY);
     setCompanyId(ANY);
@@ -82,18 +97,27 @@ export default function JobsPage() {
       </div>
 
       <form
-        className="mt-3 flex gap-2"
+        className="mt-3 flex flex-wrap gap-2"
         onSubmit={(e) => {
           e.preventDefault();
-          setQ(search);
+          applySearch();
         }}
       >
-        <div className="relative flex-1">
+        <div className="relative min-w-48 flex-1">
           <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search title, description, tech stack…"
+            className="bg-card pl-8"
+          />
+        </div>
+        <div className="relative w-full sm:w-56">
+          <MapPin className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={locationDraft}
+            onChange={(e) => setLocationDraft(e.target.value)}
+            placeholder="Location…"
             className="bg-card pl-8"
           />
         </div>
