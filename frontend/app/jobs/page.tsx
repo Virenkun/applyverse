@@ -34,6 +34,16 @@ const ROLE_LABELS: Record<string, string> = {
   embedded: "Embedded",
 };
 
+const SENIORITY_LABELS: Record<string, string> = {
+  plain: "No level (plain)",
+  intern: "Intern",
+  junior: "Junior",
+  mid: "Mid",
+  senior: "Senior",
+  staff: "Staff",
+  lead: "Lead / Principal",
+};
+
 export default function JobsPage() {
   const [search, setSearch] = useState("");
   const [q, setQ] = useState("");
@@ -167,8 +177,8 @@ export default function JobsPage() {
           <SelectContent>
             <SelectItem value={ANY}>Any level</SelectItem>
             {(filterOptions.data?.seniorities ?? []).map((s) => (
-              <SelectItem key={s} value={s} className="capitalize">
-                {s}
+              <SelectItem key={s} value={s}>
+                {SENIORITY_LABELS[s] ?? s}
               </SelectItem>
             ))}
           </SelectContent>

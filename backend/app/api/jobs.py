@@ -22,8 +22,17 @@ SENIORITY_PATTERNS: dict[str, str] = {
     "mid": r"\m(mid|ii|2)\M",
     "senior": r"\m(senior|sr|iii|3)\M",
     "staff": r"\m(staff)\M",
-    "lead": r"\m(lead|principal|architect|distinguished|head)\M",
+    "lead": r"\m(lead|principal|architect|distinguished|head|manager|director|vp|chief)\M",
 }
+
+# "plain" — titles carrying NO seniority marker at all (bare "Software
+# Engineer" / "Developer"), i.e. not matching any pattern above.
+SENIORITY_ANY = (
+    r"\m(intern|internship|trainee|apprentice|junior|jr|entry[- ]level|graduate|"
+    r"grad|mid|ii|2|senior|sr|iii|3|staff|lead|principal|architect|"
+    r"distinguished|head|manager|director|vp|chief)\M"
+)
+SENIORITY_PLAIN = "plain"
 ROLE_PATTERNS: dict[str, str] = {
     "frontend": r"\m(frontend|front[- ]end|react|angular|vue|ui)\M",
     "backend": r"\m(backend|back[- ]end|server[- ]side)\M",
@@ -81,7 +90,9 @@ def list_jobs(
         filters.append(Job.location.ilike(f"%{location}%"))
     if work_mode:
         filters.append(Job.work_mode == work_mode)
-    if seniority and seniority in SENIORITY_PATTERNS:
+    if seniority == SENIORITY_PLAIN:
+        filters.append(~Job.title.op("~*")(SENIORITY_ANY))
+    elif seniority and seniority in SENIORITY_PATTERNS:
         filters.append(Job.title.op("~*")(SENIORITY_PATTERNS[seniority]))
     if role and role in ROLE_PATTERNS:
         filters.append(Job.title.op("~*")(ROLE_PATTERNS[role]))
@@ -143,7 +154,7 @@ def filter_options(db: Session = Depends(get_db)) -> dict:
     return {
         "sources": sorted(sources),
         "work_modes": ["remote", "hybrid", "onsite", "unknown"],
-        "seniorities": list(SENIORITY_PATTERNS),
+        "seniorities": [SENIORITY_PLAIN, *SENIORITY_PATTERNS],
         "roles": list(ROLE_PATTERNS),
         "companies": [{"id": c.id, "name": c.name} for c in companies],
     }
