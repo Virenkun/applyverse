@@ -34,6 +34,7 @@ SENIORITY_ANY = (
 )
 SENIORITY_PLAIN = "plain"
 ROLE_PATTERNS: dict[str, str] = {
+    "software": r"\m(software engineer|software developer|software development engineer|sde|swe|programmer)\M",
     "frontend": r"\m(frontend|front[- ]end|react|angular|vue|ui)\M",
     "backend": r"\m(backend|back[- ]end|server[- ]side)\M",
     "fullstack": r"\m(full[- ]?stack)\M",

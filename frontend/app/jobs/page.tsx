@@ -22,6 +22,7 @@ const PAGE_SIZE = 25;
 const ANY = "__any__";
 
 const ROLE_LABELS: Record<string, string> = {
+  software: "Software Engineer",
   frontend: "Frontend",
   backend: "Backend",
   fullstack: "Full-stack",
