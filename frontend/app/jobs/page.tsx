@@ -118,7 +118,9 @@ export default function JobsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl p-6">
+    <div className="flex h-dvh flex-col">
+      <div className="shrink-0 border-b border-border bg-background px-6 pb-3 pt-6">
+        <div className="mx-auto max-w-4xl">
       <div className="mb-3 flex items-baseline justify-between">
         <h1 className="text-[1.9rem] text-ink">Jobs</h1>
         {total !== undefined && (
@@ -245,8 +247,12 @@ export default function JobsPage() {
           </Button>
         )}
       </div>
+        </div>
+      </div>
 
-      <div className="mt-4 space-y-3">
+      <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="mx-auto max-w-4xl">
+      <div className="space-y-3">
         {jobsQuery.isLoading &&
           Array.from({ length: 5 }).map((_, i) => (
             <Skeleton key={i} className="h-32 rounded-lg" />
@@ -280,6 +286,8 @@ export default function JobsPage() {
           </Button>
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 }
