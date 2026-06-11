@@ -22,17 +22,21 @@ export function salaryRange(
   return `${cur}${fmt((min ?? max)!)}`;
 }
 
+// Soft indigo tag — the brand's pill-tag-soft, for departments / skills
+export const TAG_STYLE =
+  "border-transparent bg-brand-subtle/45 text-brand-press font-normal";
+
 export const WORK_MODE_STYLES: Record<string, string> = {
-  remote: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  hybrid: "bg-amber-50 text-amber-700 border-amber-200",
-  onsite: "bg-sky-50 text-sky-700 border-sky-200",
-  unknown: "bg-muted text-muted-foreground border-border",
+  remote: "border-transparent bg-emerald-500/12 text-emerald-700",
+  hybrid: "border-transparent bg-cream text-[#9b6829]",
+  onsite: "border-transparent bg-brand-subtle/40 text-brand-press",
+  unknown: "border-transparent bg-secondary text-muted-foreground",
 };
 
 export const STATUS_STYLES: Record<string, string> = {
-  saved: "bg-muted text-muted-foreground border-border",
-  applied: "bg-blue-50 text-blue-700 border-blue-200",
-  interviewing: "bg-violet-50 text-violet-700 border-violet-200",
-  offer: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  rejected: "bg-red-50 text-red-600 border-red-200",
+  saved: "border-transparent bg-secondary text-ink-secondary",
+  applied: "border-transparent bg-brand-subtle/45 text-brand-press",
+  interviewing: "border-transparent bg-magenta/15 text-[#b4258f]",
+  offer: "border-transparent bg-emerald-500/14 text-emerald-700",
+  rejected: "border-transparent bg-ruby/12 text-ruby",
 };

@@ -72,10 +72,10 @@ export default function JobsPage() {
 
   return (
     <div className="mx-auto max-w-4xl p-6">
-      <div className="mb-1 flex items-baseline justify-between">
-        <h1 className="text-xl font-semibold tracking-tight">Jobs</h1>
+      <div className="mb-3 flex items-baseline justify-between">
+        <h1 className="text-[1.9rem] text-ink">Jobs</h1>
         {total !== undefined && (
-          <span className="text-sm text-muted-foreground">
+          <span className="tnum text-sm text-ink-mute">
             {total.toLocaleString()} jobs
           </span>
         )}

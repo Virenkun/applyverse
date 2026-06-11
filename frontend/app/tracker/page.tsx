@@ -192,7 +192,7 @@ export default function TrackerPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-xl font-semibold tracking-tight">
+      <h1 className="text-[1.9rem] text-ink">
         Application tracker
       </h1>
       <p className="mt-0.5 text-sm text-muted-foreground">

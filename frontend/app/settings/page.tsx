@@ -48,7 +48,7 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto max-w-4xl p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold tracking-tight">Settings</h1>
+        <h1 className="text-[1.9rem] text-ink">Settings</h1>
         <Button disabled={trigger.isPending} onClick={() => trigger.mutate(undefined)}>
           <PlayCircle className="size-4" /> Scrape all now
         </Button>

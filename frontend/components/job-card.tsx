@@ -7,7 +7,13 @@ import { Bookmark, BookmarkCheck, ExternalLink, EyeOff, Send } from "lucide-reac
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
-import { relativeDate, salaryRange, STATUS_STYLES, WORK_MODE_STYLES } from "@/lib/format";
+import {
+  relativeDate,
+  salaryRange,
+  STATUS_STYLES,
+  TAG_STYLE,
+  WORK_MODE_STYLES,
+} from "@/lib/format";
 import type { Job } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -105,9 +111,13 @@ export function JobCard({ job }: { job: Job }) {
         >
           {job.work_mode}
         </Badge>
-        {salary && <Badge variant="outline">{salary}</Badge>}
+        {salary && (
+          <Badge variant="outline" className="tnum">
+            {salary}
+          </Badge>
+        )}
         {(job.tags ?? []).slice(0, 4).map((tag) => (
-          <Badge key={tag} variant="secondary" className="font-normal">
+          <Badge key={tag} variant="outline" className={TAG_STYLE}>
             {tag}
           </Badge>
         ))}

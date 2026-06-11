@@ -82,7 +82,7 @@ export default function CompaniesPage() {
   return (
     <div className="mx-auto max-w-4xl p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold tracking-tight">Companies</h1>
+        <h1 className="text-[1.9rem] text-ink">Companies</h1>
         <Button
           variant={appliedOnly ? "default" : "outline"}
           size="sm"

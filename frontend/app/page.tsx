@@ -38,15 +38,17 @@ function StatCard({
 }) {
   return (
     <Card className="gap-2 py-4">
-      <CardHeader className="flex flex-row items-center justify-between px-4">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+      <CardHeader className="flex flex-row items-center justify-between px-5">
+        <CardTitle className="text-xs font-medium uppercase tracking-wide text-ink-mute">
           {label}
         </CardTitle>
-        <Icon className="size-4 text-muted-foreground" />
+        <Icon className="size-4 text-brand" />
       </CardHeader>
-      <CardContent className="px-4">
-        <div className="text-2xl font-semibold tracking-tight">{value}</div>
-        {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
+      <CardContent className="px-5">
+        <div className="tnum text-[2rem] font-light leading-none text-ink">
+          {value}
+        </div>
+        {hint && <p className="mt-1.5 text-xs text-ink-mute">{hint}</p>}
       </CardContent>
     </Card>
   );
@@ -66,10 +68,21 @@ export default function OverviewPage() {
   const s = stats.data;
 
   return (
-    <div className="mx-auto max-w-5xl p-6">
-      <h1 className="text-xl font-semibold tracking-tight">Overview</h1>
+    <div>
+      <div className="mesh border-b border-border">
+        <div className="mx-auto max-w-5xl px-6 pb-16 pt-10">
+          <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-ink-secondary/70">
+            Dashboard
+          </p>
+          <h1 className="mt-1 text-[2.5rem] text-ink">Overview</h1>
+          <p className="mt-1 text-sm text-ink-secondary">
+            Your job pipeline at a glance.
+          </p>
+        </div>
+      </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto -mt-10 max-w-5xl px-6 pb-10">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {s ? (
           <>
             <StatCard
@@ -189,6 +202,7 @@ export default function OverviewPage() {
             </Card>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
