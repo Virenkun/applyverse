@@ -115,6 +115,8 @@ export interface SourceSetting {
 export interface FilterOptions {
   sources: string[];
   work_modes: string[];
+  seniorities: string[];
+  roles: string[];
   companies: { id: number; name: string }[];
 }
 
@@ -122,6 +124,8 @@ export interface JobFilters {
   q?: string;
   location?: string;
   work_mode?: string;
+  seniority?: string;
+  role?: string;
   source?: string;
   company_id?: number;
   posted_after?: string;

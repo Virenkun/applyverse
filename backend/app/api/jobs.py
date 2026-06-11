@@ -14,6 +14,29 @@ router = APIRouter(prefix="/jobs", tags=["jobs"])
 
 SNIPPET_LEN = 240
 
+# Title-derived facets. Values are POSIX regex alternations matched
+# case-insensitively with word boundaries (\m..\M) against the job title.
+SENIORITY_PATTERNS: dict[str, str] = {
+    "intern": r"\m(intern|internship|trainee|apprentice)",
+    "junior": r"\m(junior|jr|entry[- ]level|graduate|grad)\M",
+    "mid": r"\m(mid|ii|2)\M",
+    "senior": r"\m(senior|sr|iii|3)\M",
+    "staff": r"\m(staff)\M",
+    "lead": r"\m(lead|principal|architect|distinguished|head)\M",
+}
+ROLE_PATTERNS: dict[str, str] = {
+    "frontend": r"\m(frontend|front[- ]end|react|angular|vue|ui)\M",
+    "backend": r"\m(backend|back[- ]end|server[- ]side)\M",
+    "fullstack": r"\m(full[- ]?stack)\M",
+    "mobile": r"\m(mobile|ios|android|react native|flutter|swift|kotlin)\M",
+    "devops": r"\m(devops|sre|site reliability|platform|infrastructure|cloud)\M",
+    "data": r"\m(data engineer|data scientist|data analyst|analytics|etl|bi)\M",
+    "ml": r"\m(machine learning|ml|ai|deep learning|nlp|computer vision)\M",
+    "qa": r"\m(qa|sdet|test|quality|automation)\M",
+    "security": r"\m(security|appsec|infosec|cyber)\M",
+    "embedded": r"\m(embedded|firmware|iot)\M",
+}
+
 
 def to_list_item(job: Job) -> JobListItem:
     item = JobListItem.model_validate(job)
@@ -36,6 +59,8 @@ def list_jobs(
     q: str | None = None,
     location: str | None = None,
     work_mode: str | None = None,
+    seniority: str | None = None,
+    role: str | None = None,
     source: str | None = None,
     company_id: int | None = None,
     tag: str | None = None,
@@ -56,6 +81,10 @@ def list_jobs(
         filters.append(Job.location.ilike(f"%{location}%"))
     if work_mode:
         filters.append(Job.work_mode == work_mode)
+    if seniority and seniority in SENIORITY_PATTERNS:
+        filters.append(Job.title.op("~*")(SENIORITY_PATTERNS[seniority]))
+    if role and role in ROLE_PATTERNS:
+        filters.append(Job.title.op("~*")(ROLE_PATTERNS[role]))
     if company_id:
         filters.append(Job.company_id == company_id)
     if tag:
@@ -114,6 +143,8 @@ def filter_options(db: Session = Depends(get_db)) -> dict:
     return {
         "sources": sorted(sources),
         "work_modes": ["remote", "hybrid", "onsite", "unknown"],
+        "seniorities": list(SENIORITY_PATTERNS),
+        "roles": list(ROLE_PATTERNS),
         "companies": [{"id": c.id, "name": c.name} for c in companies],
     }
 

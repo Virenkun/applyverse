@@ -21,12 +21,27 @@ import type { JobFilters } from "@/lib/types";
 const PAGE_SIZE = 25;
 const ANY = "__any__";
 
+const ROLE_LABELS: Record<string, string> = {
+  frontend: "Frontend",
+  backend: "Backend",
+  fullstack: "Full-stack",
+  mobile: "Mobile / iOS / Android",
+  devops: "DevOps / SRE",
+  data: "Data",
+  ml: "ML / AI",
+  qa: "QA / SDET",
+  security: "Security",
+  embedded: "Embedded",
+};
+
 export default function JobsPage() {
   const [search, setSearch] = useState("");
   const [q, setQ] = useState("");
   const [locationDraft, setLocationDraft] = useState("");
   const [location, setLocation] = useState("");
   const [workMode, setWorkMode] = useState(ANY);
+  const [seniority, setSeniority] = useState(ANY);
+  const [role, setRole] = useState(ANY);
   const [source, setSource] = useState(ANY);
   const [companyId, setCompanyId] = useState(ANY);
   const [postedDays, setPostedDays] = useState(ANY);
@@ -36,6 +51,8 @@ export default function JobsPage() {
     if (q) f.q = q;
     if (location) f.location = location;
     if (workMode !== ANY) f.work_mode = workMode;
+    if (seniority !== ANY) f.seniority = seniority;
+    if (role !== ANY) f.role = role;
     if (source !== ANY) f.source = source;
     if (companyId !== ANY) f.company_id = Number(companyId);
     if (postedDays !== ANY) {
@@ -44,7 +61,7 @@ export default function JobsPage() {
       f.posted_after = d.toISOString();
     }
     return f;
-  }, [q, location, workMode, source, companyId, postedDays]);
+  }, [q, location, workMode, seniority, role, source, companyId, postedDays]);
 
   const filterOptions = useQuery({
     queryKey: ["jobs", "filter-options"],
@@ -65,6 +82,8 @@ export default function JobsPage() {
     q ||
     location ||
     workMode !== ANY ||
+    seniority !== ANY ||
+    role !== ANY ||
     source !== ANY ||
     companyId !== ANY ||
     postedDays !== ANY;
@@ -80,6 +99,8 @@ export default function JobsPage() {
     setLocationDraft("");
     setLocation("");
     setWorkMode(ANY);
+    setSeniority(ANY);
+    setRole(ANY);
     setSource(ANY);
     setCompanyId(ANY);
     setPostedDays(ANY);
@@ -125,6 +146,34 @@ export default function JobsPage() {
       </form>
 
       <div className="mt-2 flex flex-wrap gap-2">
+        <Select value={role} onValueChange={setRole}>
+          <SelectTrigger size="sm" className="bg-card">
+            <SelectValue placeholder="Role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ANY}>Any role</SelectItem>
+            {(filterOptions.data?.roles ?? []).map((r) => (
+              <SelectItem key={r} value={r} className="capitalize">
+                {ROLE_LABELS[r] ?? r}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={seniority} onValueChange={setSeniority}>
+          <SelectTrigger size="sm" className="bg-card">
+            <SelectValue placeholder="Seniority" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ANY}>Any level</SelectItem>
+            {(filterOptions.data?.seniorities ?? []).map((s) => (
+              <SelectItem key={s} value={s} className="capitalize">
+                {s}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         <Select value={workMode} onValueChange={setWorkMode}>
           <SelectTrigger size="sm" className="bg-card">
             <SelectValue placeholder="Work mode" />
