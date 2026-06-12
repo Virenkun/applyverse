@@ -1,13 +1,20 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import applications, companies, jobs, scrape, settings, stats
 
-app = FastAPI(title="JobScrap API")
+app = FastAPI(title="Applyverse API")
 
+# Comma-separated origins, or "*" for any. Behind the nginx reverse proxy the
+# browser talks to /api on the same origin, so CORS is moot there; this only
+# matters when the API is hit cross-origin (e.g. local dev on :3000).
+_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"] if _origins.strip() == "*" else
+    [o.strip() for o in _origins.split(",") if o.strip()],
     allow_methods=["*"],
     allow_headers=["*"],
 )
