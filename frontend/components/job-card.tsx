@@ -74,20 +74,20 @@ export function JobCard({ job }: { job: Job }) {
             <span>{relativeDate(job.posted_at ?? job.scraped_at)}</span>
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-1 opacity-70 transition-opacity group-hover:opacity-100">
-          {status !== undefined ? (
-            <Badge variant="outline" className={cn("capitalize", STATUS_STYLES[status])}>
+        <div className="flex shrink-0 items-center gap-2">
+          {status !== undefined && (
+            <Badge
+              variant="outline"
+              className={cn("capitalize", STATUS_STYLES[status])}
+            >
               {status}
             </Badge>
-          ) : (
-            <Button
-              variant="ghost"
-              size="icon"
-              title="Save"
-              disabled={save.isPending}
-              onClick={() => save.mutate()}
-            >
-              <Bookmark className="size-4" />
+          )}
+          {job.canonical_url && (
+            <Button asChild size="sm">
+              <a href={job.canonical_url} target="_blank" rel="noreferrer">
+                Apply <ExternalLink className="size-3.5" />
+              </a>
             </Button>
           )}
         </div>
@@ -118,25 +118,29 @@ export function JobCard({ job }: { job: Job }) {
         ))}
         <span className="ml-auto flex items-center gap-1.5">
           {status === undefined && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-ink-mute hover:text-ruby"
-              disabled={hide.isPending}
-              onClick={() => hide.mutate()}
-            >
-              <ThumbsDown className="size-3.5" /> Not interested
-            </Button>
-          )}
-          {job.canonical_url && (
-            <Button asChild variant="outline" size="sm">
-              <a href={job.canonical_url} target="_blank" rel="noreferrer">
-                Apply <ExternalLink className="size-3.5" />
-              </a>
-            </Button>
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-ink-mute hover:text-ruby"
+                disabled={hide.isPending}
+                onClick={() => hide.mutate()}
+              >
+                <ThumbsDown className="size-3.5" /> Not interested
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={save.isPending}
+                onClick={() => save.mutate()}
+              >
+                <Bookmark className="size-3.5" /> Save
+              </Button>
+            </>
           )}
           {status === undefined || status === "saved" ? (
             <Button
+              variant="outline"
               size="sm"
               disabled={markApplied.isPending}
               onClick={() => markApplied.mutate()}
