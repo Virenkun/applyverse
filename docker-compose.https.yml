@@ -1,0 +1,47 @@
+# HTTPS overlay: Caddy on :80 + :443 with an automatic Let's Encrypt cert for
+# $APPLYVERSE_DOMAIN. Use INSTEAD of docker-compose.prod.yml:
+#   docker compose -f docker-compose.yml -f docker-compose.https.yml up -d --build
+services:
+  db:
+    ports: !reset []
+    restart: unless-stopped
+
+  redis:
+    ports: !reset []
+    restart: unless-stopped
+
+  api:
+    ports: !reset []
+    environment:
+      CORS_ORIGINS: "*"
+    restart: unless-stopped
+
+  worker:
+    restart: unless-stopped
+
+  web:
+    build:
+      args:
+        NEXT_PUBLIC_API_URL: /api
+    ports: !reset []
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      APPLYVERSE_DOMAIN: ${APPLYVERSE_DOMAIN:?set APPLYVERSE_DOMAIN in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data      # persists certs across restarts (avoid LE rate limits)
+      - caddy_config:/config
+    depends_on:
+      - web
+      - api
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:

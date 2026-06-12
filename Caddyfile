@@ -1,0 +1,16 @@
+# Domain comes from the APPLYVERSE_DOMAIN env var. Caddy auto-provisions and
+# renews a Let's Encrypt certificate for it (needs ports 80 + 443 reachable
+# and DNS pointing at this host).
+{$APPLYVERSE_DOMAIN} {
+	encode gzip
+
+	# FastAPI on the same origin → no CORS, no host baked into the bundle
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+
+	# Everything else → the Next.js app
+	handle {
+		reverse_proxy web:3000
+	}
+}
