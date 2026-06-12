@@ -4,6 +4,11 @@
 {$APPLYVERSE_DOMAIN} {
 	encode gzip
 
+	# Next.js owns /api/auth/* (login/logout); FastAPI owns the rest of /api/*
+	handle /api/auth/* {
+		reverse_proxy web:3000
+	}
+
 	# FastAPI on the same origin → no CORS, no host baked into the bundle
 	handle /api/* {
 		reverse_proxy api:8000
