@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Bookmark, BookmarkCheck, ExternalLink, EyeOff, Send } from "lucide-react";
+import {
+  Bookmark,
+  BookmarkCheck,
+  ExternalLink,
+  Send,
+  ThumbsDown,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -74,26 +80,15 @@ export function JobCard({ job }: { job: Job }) {
               {status}
             </Badge>
           ) : (
-            <>
-              <Button
-                variant="ghost"
-                size="icon"
-                title="Save"
-                disabled={save.isPending}
-                onClick={() => save.mutate()}
-              >
-                <Bookmark className="size-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                title="Hide"
-                disabled={hide.isPending}
-                onClick={() => hide.mutate()}
-              >
-                <EyeOff className="size-4" />
-              </Button>
-            </>
+            <Button
+              variant="ghost"
+              size="icon"
+              title="Save"
+              disabled={save.isPending}
+              onClick={() => save.mutate()}
+            >
+              <Bookmark className="size-4" />
+            </Button>
           )}
         </div>
       </div>
@@ -122,6 +117,17 @@ export function JobCard({ job }: { job: Job }) {
           </Badge>
         ))}
         <span className="ml-auto flex items-center gap-1.5">
+          {status === undefined && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-ink-mute hover:text-ruby"
+              disabled={hide.isPending}
+              onClick={() => hide.mutate()}
+            >
+              <ThumbsDown className="size-3.5" /> Not interested
+            </Button>
+          )}
           {job.canonical_url && (
             <Button asChild variant="outline" size="sm">
               <a href={job.canonical_url} target="_blank" rel="noreferrer">
