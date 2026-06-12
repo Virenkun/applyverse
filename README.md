@@ -1,4 +1,4 @@
-# JobScrap — Personal Job Scraper & Application Tracker
+# Applyverse — Personal Job Scraper & Application Tracker
 
 Scrapes jobs from ATS career pages (Greenhouse, Lever, Ashby, SmartRecruiters, Recruitee, Workable), RemoteOK, WeWorkRemotely, and optionally Naukri/Wellfound into Postgres, deduplicates them, and serves a dashboard with a searchable jobs feed and a Kanban application tracker.
 

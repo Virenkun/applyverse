@@ -72,6 +72,7 @@ services:
       # Force Next standalone to listen on all interfaces, not the container
       # hostname, so the published port is reachable
       HOSTNAME: "0.0.0.0"
+      APPLYVERSE_PASSWORD: ${APPLYVERSE_PASSWORD:-applyverse}
     ports:
       - "3000:3000"
     depends_on:

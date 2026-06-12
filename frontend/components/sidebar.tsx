@@ -1,19 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Briefcase,
   Building2,
   KanbanSquare,
   LayoutDashboard,
+  LogOut,
+  Rocket,
   Settings,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/", label: "Overview", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/jobs", label: "Jobs", icon: Briefcase },
   { href: "/tracker", label: "Tracker", icon: KanbanSquare },
   { href: "/companies", label: "Companies", icon: Building2 },
@@ -22,13 +24,21 @@ const NAV = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const logout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => null);
+    router.push("/login");
+    router.refresh();
+  };
+
   return (
     <aside className="sticky top-0 flex h-screen w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
       <div className="flex h-16 items-center gap-2.5 px-5">
         <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-[0_1px_2px_rgba(0,55,112,0.25)]">
-          <Briefcase className="size-4" />
+          <Rocket className="size-4" />
         </span>
-        <span className="display text-lg text-ink">JobScrap</span>
+        <span className="display text-lg text-ink">Applyverse</span>
       </div>
 
       <nav className="flex flex-1 flex-col gap-0.5 px-3 py-2">
@@ -65,7 +75,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-auto px-4 py-4">
+      <div className="mt-auto space-y-2 px-4 py-4">
         <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5">
           <span className="relative flex size-2">
             <span className="absolute inline-flex size-2 animate-ping rounded-full bg-emerald-400 opacity-60" />
@@ -73,6 +83,12 @@ export function Sidebar() {
           </span>
           <span className="text-xs text-ink-mute">Scrapers running</span>
         </div>
+        <button
+          onClick={logout}
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-ink-mute transition-colors hover:bg-accent hover:text-ink"
+        >
+          <LogOut className="size-4" /> Sign out
+        </button>
       </div>
     </aside>
   );

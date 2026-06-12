@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 
-import { Sidebar } from "@/components/sidebar";
 import { Providers } from "./providers";
 
 const inter = Inter({
@@ -17,8 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "JobScrap — job tracker",
-  description: "Personal job scraper and application tracker",
+  title: "Applyverse — every job, one universe",
+  description:
+    "Applyverse scrapes jobs from every corner of the web, dedupes them, and tracks your applications in one place.",
 };
 
 export default function RootLayout({
@@ -32,14 +32,7 @@ export default function RootLayout({
       className={`${inter.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <Providers>
-          <div className="flex min-h-screen w-full">
-            <Sidebar />
-            <main className="flex min-w-0 flex-1 flex-col bg-background">
-              {children}
-            </main>
-          </div>
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
